@@ -50,30 +50,31 @@ class PID(object):
             return False
         now = datetime.datetime.now()
         time_change = now - self.last_time
-        if time_change >= self._sample_timedelta:
-            input_value = self._input()
-            error = self.setpoint - input_value
-            self._i_term += self._ki * error
-            if self._i_term > self._out_max:
-                self._i_term = self._out_max
-            elif self._i_term < self._out_min:
-                self._i_term = self._out_min
 
-            delta_input = input_value - self._last_input
-            output = self._kp * error + self._i_term - self._kd * delta_input
-
-            if output > self._out_max:
-                output = self._out_max
-            elif output < self._out_min:
-                output = self._out_min
-
-            self.output_value = output
-
-            self._last_input = input_value
-            self.last_time = now
-            return True
-        else:
+        if time_change < self._sample_timedelta:
             return False
+
+        input_value = self._input()
+        error = self.setpoint - input_value
+        self._i_term += self._ki * error
+        if self._i_term > self._out_max:
+            self._i_term = self._out_max
+        elif self._i_term < self._out_min:
+            self._i_term = self._out_min
+
+        delta_input = input_value - self._last_input
+        output = self._kp * error + self._i_term - self._kd * delta_input
+
+        if output > self._out_max:
+            output = self._out_max
+        elif output < self._out_min:
+            output = self._out_min
+
+        self.output_value = output
+
+        self._last_input = input_value
+        self.last_time = now
+        return True
 
     @property
     def output_value(self):
@@ -116,12 +117,14 @@ class PID(object):
 
     @sample_time.setter
     def sample_time(self, new_sample_time):
-        if new_sample_time > 0:
-            ratio = new_sample_time / float(self._sample_time)
-            self._ki *= ratio
-            self._kd /= ratio
-            self._sample_time = new_sample_time
-            self._sample_timedelta = datetime.timedelta(milliseconds=new_sample_time)
+        if new_sample_time <= 0:
+            return
+
+        ratio = new_sample_time / float(self._sample_time)
+        self._ki *= ratio
+        self._kd /= ratio
+        self._sample_time = new_sample_time
+        self._sample_timedelta = datetime.timedelta(milliseconds=new_sample_time)
 
     def set_output_limits(self, out_min, out_max):
         if out_min >= out_max:
@@ -129,16 +132,18 @@ class PID(object):
         self._out_min = out_min
         self._out_max = out_max
 
-        if self.auto:
-            if self.output_value > self._out_max:
-                self.output_value = self._out_max
-            elif self.output_value < self._out_min:
-                self.output_value = self._out_min
+        if not self.auto:
+            return
 
-            if self._i_term > self._out_max:
-                self._i_term = self._out_max
-            elif self._i_term < self._out_min:
-                self._i_term = self._out_min
+        if self.output_value > self._out_max:
+            self.output_value = self._out_max
+        elif self.output_value < self._out_min:
+            self.output_value = self._out_min
+
+        if self._i_term > self._out_max:
+            self._i_term = self._out_max
+        elif self._i_term < self._out_min:
+            self._i_term = self._out_min
 
     @property
     def auto(self):
