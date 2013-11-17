@@ -91,6 +91,11 @@ though it is not inconceivable that I would eventually get around to it
 myself. Nevertheless, it should be usable as-is without too much
 difficulty.
 
+This code depends on being called at a predictable interval. It won't
+work as well under conditions which delay the call by too much, such as
+use under a non-real-time operating system which is trying to do too
+many things.
+
 There are other PID features which could be added to make this even
 better. I'm not even sure I know what they are. If you do, feel free
 to write them and submit a pull request.
