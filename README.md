@@ -31,7 +31,7 @@ The PID object must be constructed with the following parameters:
   of the object in question
 
 * ``kp``, ``ki``, and ``kd``: the three PID parameters.  (If you don't know
-  what they are you should go read about how PIDs work, though you may
+  what they are you should [go read about how PIDs work](http://en.wikipedia.org/wiki/PID_controller), though you may
   be able to get away with using defaults based on the test code herein.)
 
 * ``direct``: True if an increase in the output value will produce an
