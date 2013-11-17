@@ -39,12 +39,24 @@ The PID object must be constructed with the following parameters:
 
 ``pid = PID(input, output, setpoint, kp, ki, kd, direct)``
 
-After the object has been created, just call ``pid.compute()`` as
+After the object has been created, turn PID control on with ``pid.auto = True``,
+and set the range of your output control with ``pid.set_output_limits(min_out, max_out)``.
+At that point you can just call ``pid.compute()`` as
 frequently as possible, preferably via an interrupt of some sort. The
 frequency required for good results will depend on the characteristics
 of your entire system, but the default update frequency of 100
 milliseconds is probably a good place to start. If the system is
 working, then the input value will approach the set point and stay there.
+
+You can change the system back and forth from automatic to manual mode at
+any time by setting ``pid.auto`` to ``False`` (for manual control) or ``True``
+(for automatic).
+
+If you want to change the sample rate, set ``pid.sample_time`` to a number
+of milliseconds. The default value is ``100``. If you want to change the
+set point, just set ``pid.setpoint``, and if you want to re-set any of the
+PID parameters you can call ``pid.set_tunings(kp, ki, kd)``. The system should
+be pretty reasonable under these changes.
 
 Testing
 -------
